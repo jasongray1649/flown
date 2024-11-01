@@ -1,112 +1,268 @@
 #this program takes an input of 1s and 0s, then a row-separator character of your choice, which may not be 0, 1, 0x00 or 0xFF (newline is a good choice). It outputs infinitely many rows of 0x00 and 0xFF characters, separated by your specified row-separator, in accordance with rule 124, the horizontal reflection of rule 110 (see https://mathworld.wolfram.com/Rule110.html )
-
+ 
 #rule 124, the horizontal reflection of rule 110 (and thus, is bounded on the lefthand side):
 #111: 0
-#011: 1
-#101: 1
-#001: 0
 #110: 1
-#010: 1
+#101: 1
 #100: 1
+#011: 1
+#010: 1
+#001: 0
 #000: 0
 #For more information, see https://mathworld.wolfram.com/Rule110.html and https://en.wikipedia.org/wiki/Rule_110#Interesting_properties
 
 #The internal encoding ("complex characters") is not as svelte as ideal, since we need to have an explicit end-of-the-universe marker that expands to the right at lightspeed for easy printing... otherwise we'd never know when to stop printing any given row of the automaton. At least the tape is full of 0s to start with, so we don't need to explicitly populate the eou.
-# Internal symbol encoding:
+# Internal symbol encoding: 
 #blank blank: end-of-the-universe mark (eou)
-#eof eof: 1
-#eof blank: 0
-# I could use blank eof for an invalidated/old eou (I might have to introduce bou notation again, so the first pass of the internally-encoded process doesn't need to have special logic 🤔), but I'll probably just use eof eof for convenience (I can always crush a complex cell into an eof eof). And that means I'll have to change the encoding of 1...
-## TODO: Proposed new encoding: eou: blank blank ; 0: blank eof (this also helps bc the eof counts as 0 in rule 124 so we can just check the first cell maybe) ; 1: eof blank ; bou: eof eof (don't overwrite cells directly, but 1 behind, so the next cell will have information enough to complete its print) #this would require modifying almost all of the program, but may be necessary for continuing.
-# The external encoding is just printing blank for 0 and eof for 1, also the user-supplied separator for the user-supplied separator, which is like encoding the eou.
+#eof blank: 1
+#blank eof: 0
+#eof eof: beginning-of-the-universe mark
+# The external encoding is just printing blank for 0 and eof for 1, also the user-supplied separator for the user-supplied separator, which is like encoding the eou. (BOU's are technically read, externally as 0's, but prompt special behavior to branch right.)
+
+# Brief description of implementation:
+# Program reads and translates input to internal encoding, then runs iterator, which reads, prints, overwrites, and rewrites updated encoding according to rule 124.
+# Each iteration must write to right of old tape and replace old tape with BOU (eof eof), as there is no way to write blanks.
+# Iterations will be separated by BOU's on right as they are written.
+# Complexes are overwritten as they are read. Rightmost bit of triplet is always the cell read, excepting the initial read.
+# This continues until leftmost bou is read, which is interpreted as a 0 and triggers the final two writes (and new rightmost bou) before printing the separator. 
+# After separator is printed, and initial read begins again.
+
+# Comments indicate current position of tape relative to two-cell complex using the following syntax:
+# ( [x] x ) Where x can be e (known eof), b (known blank), ? (unknown character). Brackets indicate current position of tape, at that line. (For example, if a line reads "100 right #(? [?]), the comment indicates the tape's position AFTER "right" has been excecuted.)
+
+#TODO: Finish iterator beyond initial read.
+#TODO: Implement 
 
 #read in the input (until a non-1-or-0 separator character is found)
 10 in
-11 out #debugging statement
+# 11 out debugging statement
 #check it
 20 if 0
 21 go 30
 22 if 1
 23 go 30
-25 go 100 # we found the separator, move on!
+25 go 50 # we found the separator, move on!
 # advance input loop
 30 right
 31 go 10
 
-#translate the input
-#go back to the left edge
+#at this point it's e0110101010101[s]bbbbbb.
+
+#initial BOU (eof eof)
+#not strictly necessary but makes iterative logic consistent
+50 right #immediate right of separator
+55 in
+60 right #right of first eof
+65 in 
+70 left # 0101010s[e]ebb
+75 left # tapehead at separator 
+
+
+
+#translate the input (loop always begins at separator)
+#Go to left edge of tape. Read if 1 or 0, go to corresponding section.
 100 left
-110 if eof
+110 if eof #found left edge of untranslated data
 111 go 200
-112 go 100
-200 right # get on the first of the remaining input
+112 go 100 #loop
+
+200 right #get on the first of the remaining input
 210 if 1
 220 go 300
 230 if 0
 240 go 400
-250 go 500
+249 #no input remaining
+250 go 850 #on separator
+
+
 
 300 # we've read a 1
-310 in #overwrite to keep our place for next time
-#go right until the eou, making sure to skip over blanks in the 0-complexes
+310 in #OVERWRITE 1
+
+#go right until the eou
+#get to separator
 320 right
-321 if blank
-322 go 350 #this is the eou, we're on the first cell of its two-cell complex
-330 if eof #non-eou complex
-331 right
-332 go 320 #non-eou non-complex, so we'll just skip one, like regular
+321 if 1
+322 go 320
+323 if 0
+324 go 320
+325 #head at separator 
+330 right #at first cell of complex
 
-350 in #we found eou, write a 1 (eof eof)
-351 right
-352 in
+#check if eou
+340 if blank #at first cell
+341 go 370
+350 right #(e ?) second cell
+360 go 330
 
-360 go 800
+370 right #second cell
+375 if blank #found eou
+376 go 380
+377 go 330 #found bou
+
+380 left
+381 in #write 1 (eb)
+390 go 800
  
+
+
 400 #we've read a 0
 410 in #overwrite to keep our place for next time
 #go right until the eou, making sure to skip over blanks in the 0-complexes
+
+#get to separator
 420 right
-421 if blank
-422 go 450 #this is the eou, we're on the first cell of its two-cell complex
-430 if eof #non-eou complex
-431 right
-432 go 420 #non-eou non-complex, so we'll just skip one, like regular
+421 if 1
+422 go 420 
+430 if 0
+431 go 420
+435 right #at first cell of complex
 
-450 in #we found eou, write a 0 (eof blank)
-451 right
-452 #blank
+#check if cell eou
+440 if blank 
+441 go 470
+445 right
+450 go 435
 
-460 go 800
+470 right #second cell
+475 if blank #found eou
+476 go 480
+477 go 435
 
-#we've read the newline... that means we're done translating
-500 right #advance on to first complex character
-501 go 1000 #print first line
+480 in #write 0 (be)
+485 left #first cell
+490 go 800
 
+#we just translated a character at first (bb) on right 
+#skip left until separator
 800 left
 801 if eof
 802 go 800
 803 if blank
 804 go 800
-#we must be at the separator
-#check if we've already translated every character
-820 go 100
+810 #we must be at the separator   eeeee01[s]ee
+820 go 100 #check if we've already translated every character
 
-#print the line, (if you're on the first complex character of the line)
-1000 if blank
-1010 go 1110 #we hit the eou, so we must go back on the tape to print sep
-1011 right
-1012 out #this will be blank for 0 and eof for 1
-1013 right
-1020 go 1000 #loop
+850 # on separator, all characters done, write bou at end
 
-#go back to the sep and print the sep
+#right until eou
+851 right #([?] ?)
+852 if blank
+853 go 870
+854 right #(e [?])
+855 go 851 
+870 right #(b [?]) 
+871 if eof
+872 go 851
+
+880 #(b [b]) found eou, write bou
+881 in #(b [e])
+882 left 
+883 in #([e] e)
+#translation and ending bou finished writing
+
+
+
+#left until separator
+900 left 
+910 if eof
+915 go 900
+920 if blank
+925 go 900
+990 #on separator
+
+
+999 right 
+#PRINT LINE 
+#starting on the left of a cell, parses and prints cells left to right, skipping bou (e e)
+
+1000 if eof # ([?] ? )
+1001 go 1020
+1002 go 1030 
+
+1020 right # (e [?]) 
+1021 if eof #skip bou
+1022 go 999
+1024 left # ([e] b) 
+1025 out #print 1
+1026 right
+1028 go 999
+
+1030 right # (b [?]) 
+1031 if blank #found eou
+1032 go 1110
+1035 left #first cell
+1036 out #print 0
+1037 right #second cell
+1038 go 999
+
+#go left until separator and print
 1110 left
 1120 if eof
 1121 go 1110
 1130 if blank
 1131 go 1110
-1140 out #we must have reached the sep here.
+1140 out #print separator 
 
-#I guess we exit then lol
+1150 go 999 #DEBUG LOOP
 
-#TODO: iterate forever, baby!
+#print complete
+#everything above works
+
+#first read
+1200 #from separator, go right until first 1 or 0
+1201 right #([?] ?)
+1210 if blank
+1211 go 1250 
+1215 right #(e [?])
+1220 if eof #found bou (e [e])
+1221 go 1201 #loop
+#found 1
+1229 # (e [b])
+1230 in #overwrite
+1235 right #start of next cell
+1240 go 2100 #01?
+#found 0
+1250 right #(b [e])
+1260 left #(b [e])
+1265 in #overwrite
+1270 right
+1271 right #start of next cell
+1275 go 2010 #00?
+
+
+#input is translated with bou at end, looks like esbb[1]010101beeee, tapehead on start of third complex (counting bou as first), second just overwritten
+
+#as written the iterator looks like it reads, given the first two numbers. this will read a 1 or 0
+#This puts us at 
+
+2000 #ITERATOR
+
+#READ
+#Starting at first cell of third complex 
+#check for 1 or 0 or bou (which counts as 0) or eou (dunno what to do here yet)
+#overwrite and send to appropriate next step
+#([?] ?)
+
+
+#00?
+2010 if blank
+2011 go 2030
+
+2030 right #(b [?])
+
+
+
+#01?
+
+#10?
+
+#11?
+
+
+
+#GO RIGHT TILL EOF AND LOOP
+2900 right
+2910 if blank
+2920 go 999
+3000 go 2900
