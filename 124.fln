@@ -138,7 +138,6 @@
 
 #DEBUG: Print then exit
 #From anywhere, go right until separator, print twice, then print everything written so far until two eou's in a row are read.
-
 #go right until blank (to ensure we are never left of separator)
 500 right
 505 if blank
@@ -150,39 +149,28 @@
 530 if eof
 531 go 520
 535 out #print separator (will get printed twice)
-
 #right and print each cell until four blanks in a row are read. 
 540 out
 545 right
 550 if eof
 551 go 540
-
-#on blank
-560 out 
+560 out #on blank
 565 right
 570 if eof
 571 go 540
-
-#on second blank
-575 out 
+575 out #on second blank
 580 right 
 585 if eof
 586 go 540
-
-# on third blank
-590 out 
+590 out # on third blank
 595 right
 600 if eof
 601 go 540
-
-#on fourth blank
-610 out
+610 out #on fourth blank
 615 right 
 620 if eof
 621 go 540
-
-#exit 
-630 go 4000
+630 go 9999 #EXIT
 
 
 
@@ -228,6 +216,7 @@
 990 #on separator
 
 
+
 999 right 
 #PRINT LINE 
 #starting on the left of a cell, parses and prints cells left to right, skipping bou (e e)
@@ -261,11 +250,11 @@
 1140 out #print separator 
 
 
-1150 go 500
-# 1150 go 999 DEBUG LOOP
+# 1150 go 500 DEBUG
+# 1150 go 999 DEBUG INF LOOP
 
 #print complete
-#everything above works
+
 
 
 
@@ -320,11 +309,13 @@
 #11?
 
 
-
-#GO RIGHT TILL EOF AND LOOP
-2900 right
-2910 if blank
-2920 go 999
-3000 go 2900
-
-4000 #exit
+#DEBUG, indicates reached end of program instead of exiting directly
+#right until any blank, then print 3 blank to indicate end (should see 3 blank then sep twice)
+9900 if blank
+9901 go 9910
+9905 right
+9910 go 9900
+9910 out
+9911 out
+9912 out
+9998 go 500 #print then exit if program gets to end
