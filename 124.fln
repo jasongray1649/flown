@@ -35,7 +35,7 @@
 
 #read in the input (until a non-1-or-0 separator character is found)
 10 in
-# 11 out debugging statement
+11 out #debugging statement
 #check it
 20 if 0
 21 go 30
@@ -133,6 +133,62 @@
 485 left #first cell
 490 go 800
 
+
+
+
+#DEBUG: Print then exit
+#From anywhere, go right until separator, print twice, then print everything written so far until two eou's in a row are read.
+
+#go right until blank (to ensure we are never left of separator)
+500 right
+505 if blank
+510 go 520
+515 go 500
+520 left #left until special character
+525 if blank
+526 go 520
+530 if eof
+531 go 520
+535 out #print separator (will get printed twice)
+
+#right and print each cell until four blanks in a row are read. 
+540 out
+545 right
+550 if eof
+551 go 540
+
+#on blank
+560 out 
+565 right
+570 if eof
+571 go 540
+
+#on second blank
+575 out 
+580 right 
+585 if eof
+586 go 540
+
+# on third blank
+590 out 
+595 right
+600 if eof
+601 go 540
+
+#on fourth blank
+610 out
+615 right 
+620 if eof
+621 go 540
+
+#exit 
+630 go 4000
+
+
+
+
+
+
 #we just translated a character at first (bb) on right 
 #skip left until separator
 800 left
@@ -204,10 +260,14 @@
 1131 go 1110
 1140 out #print separator 
 
-1150 go 999 #DEBUG LOOP
+
+1150 go 500
+# 1150 go 999 DEBUG LOOP
 
 #print complete
 #everything above works
+
+
 
 #first read
 1200 #from separator, go right until first 1 or 0
@@ -266,3 +326,5 @@
 2910 if blank
 2920 go 999
 3000 go 2900
+
+4000 #exit
