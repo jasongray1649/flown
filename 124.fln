@@ -303,19 +303,23 @@
 
 
 #01?
+2100
 
 #10?
 
 #11?
 
 
-#DEBUG, indicates reached end of program instead of exiting directly
+
+
+
+#DEBUG, indicates reached end of program instead of exiting directly 
 #right until any blank, then print 3 blank to indicate end (should see 3 blank then sep twice)
 9900 if blank
 9901 go 9910
 9905 right
-9910 go 9900
-9910 out
+9906 go 9900
+9910 out #blank
 9911 out
 9912 out
 9998 go 500 #print then exit if program gets to end
