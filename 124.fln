@@ -372,15 +372,57 @@
 2399 go 9900
 
 
-#WRITE (0-50 is for normal cells, 50-100 is for eou and bou)
+#WRITE & PRINT (0-50 is for normal cells, 50-100 is for eou and bou)
 # 0, 1, 7 are 0. 2-6 are 1.
-# starting on first cell of right of most recently read cell
+#starting on first cell last read complex
 #goes right until first eou, writes appropriate numbers
 #goes left until bou, then go left until next bou
 #if next bou is immediate, go to appropriate 4x00
 #if next bou is not immediate, go to first cell on right and loop at 2x000
 
 3000 #000 (0)
+#([?] ?) find eou
+3001 if blank
+3002 go 3006
+3003 right
+3004 right 
+3005 go 3001
+3006 if eof
+3007 go 3004
+3009 left #([b] b) found eou
+3010 out #PRINT
+3014 right #(b [e])
+3015 in #WRITE
+3016 left 
+#left until first bou
+3020 left # (? [?])
+3021 if eof
+3022 go 3027
+3023 left 
+3024 go 3020
+3027 left # ([?] e)
+3028 if blank
+3029 go 3020
+3040 left #(? [?]) found first bou
+3041 if blank
+3042 go 3049
+3043 left #([?] e)
+3044 if eof
+3045 go 4000 #last write done
+3046 go 3050
+3049 left
+3050 left #(? [?])
+3051 if blank
+3052 go 3049
+3053 left #([?] e)
+3054 if blank
+3055 go 3050
+3060 #found second bou
+3065 right 
+3070 right #([?] ?)
+3075 go 2000
+
+
 3100 #001 (0)
 3200 #010 (1)
 3300 #011 (1)
@@ -391,14 +433,19 @@
 
 
 #if read two consecutive bou's in 3000's, stores last two digits read
-#writes appropriate last two digits
+#writes & prints appropriate last two digits
 #then writes ending bou
+#returns to separator and print
 #loops back at 1200 at appropriate place in tape
 4000 #00 (000 0, 000 0)
+#([e] e)
 4100 #01 (010 1, 100 1)
 4200 #10 (100 1, 000 0)
 4300 #11 (110 1, 100 1)
 
+4500 #write ending bou
+4600 #goto and print separator
+4700 go 1200 #LOOP
 
 
 
