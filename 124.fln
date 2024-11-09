@@ -248,8 +248,6 @@
 1130 if blank
 1131 go 1110
 1140 out #print separator 
-
-
 # 1150 go 500 DEBUG
 # 1150 go 999 DEBUG INF LOOP
 
@@ -273,42 +271,90 @@
 1240 go 2100 #01?
 #found 0
 1250 right #(b [e])
-1260 left #(b [e])
+1251 if blank #DEBUG
+1252 go 500 #DEBUG error, (first blank should always be start of 0)
+1260 left #([b] e)
 1265 in #overwrite
-1270 right
+1270 right #(e [e])
 1271 right #start of next cell
-1275 go 2010 #00?
+1275 go 2000 #00?
 
 
 #input is translated with bou at end, looks like esbb[1]010101beeee, tapehead on start of third complex (counting bou as first), second just overwritten
 
-#as written the iterator looks like it reads, given the first two numbers. this will read a 1 or 0
-#This puts us at 
 
-2000 #ITERATOR
+#ITERATOR 
 
-#READ
-#Starting at first cell of third complex 
-#check for 1 or 0 or bou (which counts as 0) or eou (dunno what to do here yet)
+#READ THIRD CELL
+#Starting at first cell of third complex (looped back to after writing, going left until second bou, then right one)
+#check for 1 or 0 or bou (which counts as 0) (EOU is error)
 #overwrite and send to appropriate next step
 #([?] ?)
 
 
-#00?
-2010 if blank
+2000 #00?
+# ([?] ?)
+2010 if blank 
 2011 go 2030
+2015 right #(e [?])
+2017 if eof #error
+2018 go 500
+2020 in #(e [e])
+2021 right #first cell on right
+2025 go 3100 #001
 
 2030 right #(b [?])
+2035 if blank #error
+2036 go 500
+2040 left #([b] e)
+2045 in #overwrite ([e] e)
+2050 right
+2055 right #first cell on right
+2060 go 3000  #000
+
+2099 go 2200 
 
 
+#01? 
+#([?] ?)
 
-#01?
-2100
 
 #10?
 
 #11?
 
+
+
+
+
+
+
+#WRITE (0-50 is for normal cells, 50-100 is for eou and bou)
+# 0, 1, 7 are 0. 2-6 are 1.
+# starting on first cell of right of most recently read cell
+#goes right until first eou, writes appropriate numbers
+#goes left until bou, then go left until next bou
+#if next bou is immediate, go to appropriate 4x00
+#if next bou is not immediate, go to first cell on right and loop at 2x000
+
+3000 #000
+3100 #001
+3200 #010
+3300 #011
+3400 #100
+3500 #101
+3600 #110
+3700 #111
+
+
+#if read two bou's in 3000's, stores last two digits read
+#writes appropriate last two digits
+#then writes ending bou
+#loops back at 1200 at appropriate place
+4000 #00 (000 0, 000 0)
+4100 #01 (010 1, 100 1)
+4200 #10 (100 1, 000 0)
+4300 #11 (110 1, 100 1)
 
 
 
@@ -321,5 +367,5 @@
 9906 go 9900
 9910 out #blank
 9911 out
-9912 out
+9912 out 
 9998 go 500 #print then exit if program gets to end
