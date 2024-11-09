@@ -218,7 +218,7 @@
 
 
 999 right 
-#PRINT LINE 
+#PRINT FIRST LINE 
 #starting on the left of a cell, parses and prints cells left to right, skipping bou (e e)
 
 1000 if eof # ([?] ? )
@@ -422,6 +422,9 @@
 3070 right #([?] ?)
 3075 go 2000
 
+#TODO: COPY ABOVE TO 7 OTHER CASES
+#TODO: WRITE 4000's
+#TODO: IMPLEMENT FINITE CHECK (POSSIBLY AT 1100)
 
 3100 #001 (0)
 3200 #010 (1)
@@ -435,10 +438,12 @@
 #if read two consecutive bou's in 3000's, stores last two digits read
 #writes & prints appropriate last two digits
 #then writes ending bou
-#returns to separator and print
-#loops back at 1200 at appropriate place in tape
+#loops back at 1110 
 4000 #00 (000 0, 000 0)
 #([e] e)
+#right until eou
+#write 0 0 bou
+#loop at 1110
 4100 #01 (010 1, 100 1)
 4200 #10 (100 1, 000 0)
 4300 #11 (110 1, 100 1)
