@@ -292,7 +292,7 @@
 #([?] ?)
 
 
-2000 #00?
+2000 #00? (option shift down selects multiples)
 # ([?] ?)
 2010 if blank 
 2011 go 2030
@@ -311,19 +311,73 @@
 2050 right
 2055 right #first cell on right
 2060 go 3000  #000
+2099 go 9900
 
-2099 go 2200 
+#01?
+# ([?] ?)
+2110 if blank 
+2111 go 2130
+2115 right #(e [?])
+2117 if eof #error
+2118 go 500
+2120 in #(e [e])
+2121 right #first cell on right
+2125 go 3300 #011
 
+2130 right #(b [?])
+2135 if blank #error
+2136 go 500
+2140 left #([b] e)
+2145 in #overwrite ([e] e)
+2150 right
+2155 right #first cell on right
+2160 go 3200  #010
+2199 go 9900
 
-#01? 
-#([?] ?)
 
 
 #10?
+# ([?] ?)
+2210 if blank 
+2211 go 2230
+2215 right #(e [?])
+2217 if eof #error
+2218 go 500
+2220 in #(e [e])
+2221 right #first cell on right
+2225 go 3500 #101
+
+2230 right #(b [?])
+2235 if blank #error
+2236 go 500
+2240 left #([b] e)
+2245 in #overwrite ([e] e)
+2250 right
+2255 right #first cell on right
+2260 go 3400  #100
+2299 go 9900
+
 
 #11?
+# ([?] ?)
+2310 if blank 
+2311 go 2330
+2315 right #(e [?])
+2317 if eof #error
+2318 go 500
+2320 in #(e [e])
+2321 right #first cell on right
+2325 go 3700 #111
 
-
+2330 right #(b [?])
+2335 if blank #error
+2336 go 500
+2340 left #([b] e)
+2345 in #overwrite ([e] e)
+2350 right
+2355 right #first cell on right
+2360 go 3600  #110
+2399 go 9900
 
 
 
@@ -347,14 +401,17 @@
 3700 #111
 
 
-#if read two bou's in 3000's, stores last two digits read
+#if read two consecutive bou's in 3000's, stores last two digits read
 #writes appropriate last two digits
 #then writes ending bou
-#loops back at 1200 at appropriate place
+#loops back at 1200 at appropriate place in tape
 4000 #00 (000 0, 000 0)
 4100 #01 (010 1, 100 1)
 4200 #10 (100 1, 000 0)
 4300 #11 (110 1, 100 1)
+
+
+
 
 
 
