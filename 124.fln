@@ -281,18 +281,17 @@
 
 
 #input is translated with bou at end, looks like esbb[1]010101beeee, tapehead on start of third complex (counting bou as first), second just overwritten
-
+#third complex is read, overwritte, and appropriate digit is written on write
+#tapehead goes left to bou, then to next bou. If next bou is immediate, write last two digits assuming next two reads are 0
+#if next bou is not immediate, go to immediate right of bou and loop at 2X00
 
 #ITERATOR 
 
 #READ THIRD CELL
-#Starting at first cell of third complex (looped back to after writing, going left until second bou, then right one)
-#check for 1 or 0 or bou (which counts as 0) (EOU is error)
+#Starting at first cell of third complex, check for 1 or 0 
 #overwrite and send to appropriate next step
-#([?] ?)
 
-
-2000 #00? (option shift down selects multiples)
+2000 #00? 
 # ([?] ?)
 2010 if blank 
 2011 go 2030
@@ -302,7 +301,6 @@
 2020 in #(e [e])
 2021 right #first cell on right
 2025 go 3100 #001
-
 2030 right #(b [?])
 2035 if blank #error
 2036 go 500
@@ -323,7 +321,6 @@
 2120 in #(e [e])
 2121 right #first cell on right
 2125 go 3300 #011
-
 2130 right #(b [?])
 2135 if blank #error
 2136 go 500
@@ -333,8 +330,6 @@
 2155 right #first cell on right
 2160 go 3200  #010
 2199 go 9900
-
-
 
 #10?
 # ([?] ?)
@@ -346,7 +341,6 @@
 2220 in #(e [e])
 2221 right #first cell on right
 2225 go 3500 #101
-
 2230 right #(b [?])
 2235 if blank #error
 2236 go 500
@@ -356,7 +350,6 @@
 2255 right #first cell on right
 2260 go 3400  #100
 2299 go 9900
-
 
 #11?
 # ([?] ?)
@@ -368,7 +361,6 @@
 2320 in #(e [e])
 2321 right #first cell on right
 2325 go 3700 #111
-
 2330 right #(b [?])
 2335 if blank #error
 2336 go 500
@@ -380,9 +372,6 @@
 2399 go 9900
 
 
-
-
-
 #WRITE (0-50 is for normal cells, 50-100 is for eou and bou)
 # 0, 1, 7 are 0. 2-6 are 1.
 # starting on first cell of right of most recently read cell
@@ -391,14 +380,14 @@
 #if next bou is immediate, go to appropriate 4x00
 #if next bou is not immediate, go to first cell on right and loop at 2x000
 
-3000 #000
-3100 #001
-3200 #010
-3300 #011
-3400 #100
-3500 #101
-3600 #110
-3700 #111
+3000 #000 (0)
+3100 #001 (0)
+3200 #010 (1)
+3300 #011 (1)
+3400 #100 (1)
+3500 #101 (1)
+3600 #110 (1)
+3700 #111 (0)
 
 
 #if read two consecutive bou's in 3000's, stores last two digits read
