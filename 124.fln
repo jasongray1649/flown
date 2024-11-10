@@ -32,7 +32,7 @@
 
 #read in the input (until a non-1-or-0 separator character is found)
 10 in
-11 out #debugging statement
+#11 out debugging statement
 #check it
 20 if 0
 21 go 30
