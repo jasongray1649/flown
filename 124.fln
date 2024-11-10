@@ -202,8 +202,6 @@
 883 in #([e] e)
 #translation and ending bou finished writing
 
-
-
 #left until separator
 900 left 
 910 if eof
@@ -245,9 +243,6 @@
 1130 if blank
 1131 go 1110
 1140 out #print separator 
-# 1150 go 500 DEBUG
-# 1150 go 999 DEBUG INF LOOP
-
 #print complete
 
 
@@ -708,15 +703,78 @@
 4000 #00 (000 0, 000 0)
 #([e] e)
 #right until eou
-#write 0 0 bou
-#loop at 1110
+4001 right 
+4002 right 
+4003 right 
+4005 right #([?] ?)
+4006 if eof
+4007 go 4003
+4008 right #(b [?])
+4009 if blank
+4010 go 4020 #found eou
+4011 go 4005
+#write 0 0 (b [b])
+4020 out #PRINT first 0
+4021 in #WRITE first 0
+4025 right
+4026 right 
+4027 out #PRINT second 0
+4028 in #WRITE second 0
+4030 right #([b] b)
+4090 go 4500
+
 4100 #01 (010 1, 100 1)
+4101 right 
+4102 right 
+4103 right 
+4105 right #([?] ?)
+4106 if eof
+4107 go 4103
+4108 right #(b [?])
+4109 if blank
+4110 go 4120 #found eou
+4111 go 4105
+4120 left #write 1 1 
+4121 in #WRITE first 1 ([e] b)
+4122 out #PRINT 
+4123 right
+4124 right
+4125 in #WRITE second 1 ([e] b)
+4126 out #PRINT
+4130 right
+4135 right ([b] b)
+4190 go 4500
+
 4200 #10 (100 1, 000 0)
-4300 #11 (110 1, 100 1)
+4201 right 
+4202 right 
+4203 right 
+4205 right #([?] ?)
+4206 if eof
+4207 go 4203
+4208 right #(b [?])
+4209 if blank
+4210 go 4220 #found eou
+4211 go 4205
+4220 left #write 1 0 
+4221 in #WRITE first 1 ([e] b)
+4222 out #PRINT
+4223 right
+4224 right
+4225 right #(b [b])
+4226 out #PRINT second 0
+4227 in #WRITE second 0
+4230 right #10([b] b)
+4290 go 4500
+
+4300 go 4100 #11 (110 1, 100 1)
 
 4500 #write ending bou
-4600 #goto and print separator
-4700 go 1200 #LOOP
+#??([b] b)
+4520 in
+4525 right
+4530 in
+4600 #go 1110 #LOOP
 
 
 
@@ -733,3 +791,13 @@
 9911 out
 9912 out 
 9998 go 500 #print then exit if program gets to end
+
+#test 1
+#1010101001 input
+#11111111011 expected output
+#111111110 output
+
+#test 2
+#1001010001
+#11011110011
+#11011110011
