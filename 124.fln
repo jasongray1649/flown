@@ -30,9 +30,6 @@
 # Comments indicate current position of tape relative to two-cell complex using the following syntax:
 # ( [x] x ) Where x can be e (known eof), b (known blank), ? (unknown character). Brackets indicate current position of tape, at that line. (For example, if a line reads "100 right #(? [?]), the comment indicates the tape's position AFTER "right" has been excecuted.)
 
-#TODO: Finish iterator beyond initial read.
-#TODO: Implement 
-
 #read in the input (until a non-1-or-0 separator character is found)
 10 in
 11 out #debugging statement
@@ -374,7 +371,7 @@
 
 #WRITE & PRINT (0-50 is for normal cells, 50-100 is for eou and bou)
 # 0, 1, 7 are 0. 2-6 are 1.
-#starting on first cell last read complex
+#starting on first cell right of last read complex
 #goes right until first eou, writes appropriate numbers
 #goes left until bou, then go left until next bou
 #if next bou is immediate, go to appropriate 4x00
@@ -387,8 +384,9 @@
 3003 right
 3004 right 
 3005 go 3001
-3006 if eof
-3007 go 3004
+3006 right
+3007 if eof
+3008 go 3004
 3009 left #([b] b) found eou
 3010 out #PRINT
 3014 right #(b [e])
@@ -422,17 +420,285 @@
 3070 right #([?] ?)
 3075 go 2000
 
-#TODO: COPY ABOVE TO 7 OTHER CASES
 #TODO: WRITE 4000's
 #TODO: IMPLEMENT FINITE CHECK (POSSIBLY AT 1100)
 
 3100 #001 (0)
+3101 if blank
+3102 go 3106
+3103 right
+3104 right 
+3105 go 3101
+3106 right
+3107 if eof
+3108 go 3104
+3109 left #([b] b) found eou
+3110 out #PRINT
+3114 right #(b [e])
+3115 in #WRITE
+3116 left 
+3120 left # (? [?])
+3121 if eof
+3122 go 3127
+3123 left 
+3124 go 3120
+3127 left # ([?] e)
+3128 if blank
+3129 go 3120
+3140 left #(? [?]) found first bou
+3141 if blank
+3142 go 3149
+3143 left #([?] e)
+3144 if eof
+3145 go 4100 #last write done
+3146 go 3150
+3149 left
+3150 left #(? [?])
+3151 if blank
+3152 go 3149
+3153 left #([?] e)
+3154 if blank
+3155 go 3150
+3160 #found second bou
+3165 right 
+3170 right #([?] ?)
+3175 go 2100
+
 3200 #010 (1)
+3201 if blank
+3202 go 3206
+3203 right
+3204 right 
+3205 go 3201
+3206 right
+3207 if eof
+3208 go 3204
+3209 left #([b] b) found eou
+3210 in #WRITE
+3214 out #PRINT
+3220 left # (? [?])
+3221 if eof
+3222 go 3227
+3223 left 
+3224 go 3220
+3227 left # ([?] e)
+3228 if blank
+3229 go 3220
+3240 left #(? [?]) found first bou
+3241 if blank
+3242 go 3249
+3243 left #([?] e)
+3244 if eof
+3245 go 4200 #last write done
+3246 go 3250
+3249 left
+3250 left #(? [?])
+3251 if blank
+3252 go 3249
+3253 left #([?] e)
+3254 if blank
+3255 go 3250
+3260 #found second bou
+3265 right 
+3270 right #([?] ?)
+3275 go 2200
+
 3300 #011 (1)
+3301 if blank
+3302 go 3306
+3303 right
+3304 right 
+3305 go 3301
+3306 right
+3307 if eof
+3308 go 3304
+3309 left #([b] b) found eou
+3310 in #WRITE
+3315 out #PRINT
+3320 left # (? [?])
+3321 if eof
+3322 go 3327
+3323 left 
+3324 go 3320
+3327 left # ([?] e)
+3328 if blank
+3329 go 3320
+3340 left #(? [?]) found first bou
+3341 if blank
+3342 go 3349
+3343 left #([?] e)
+3344 if eof
+3345 go 4300 #last write done
+3346 go 3350
+3349 left
+3350 left #(? [?])
+3351 if blank
+3352 go 3349
+3353 left #([?] e)
+3354 if blank
+3355 go 3350
+3360 #found second bou
+3365 right 
+3370 right #([?] ?)
+3375 go 2300
+
 3400 #100 (1)
+3401 if blank
+3402 go 3406
+3403 right
+3404 right 
+3405 go 3401
+3406 right
+3407 if eof
+3408 go 3404
+3409 left #([b] b) found eou
+3410 in #WRITE
+3415 out #PRINT
+3420 left # (? [?])
+3421 if eof
+3422 go 3427
+3423 left 
+3424 go 3420
+3427 left # ([?] e)
+3428 if blank
+3429 go 3420
+3440 left #(? [?]) found first bou
+3441 if blank
+3442 go 3449
+3443 left #([?] e)
+3444 if eof
+3445 go 4000 #last write done
+3446 go 3450
+3449 left
+3450 left #(? [?])
+3451 if blank
+3452 go 3449
+3453 left #([?] e)
+3454 if blank
+3455 go 3450
+3460 #found second bou
+3465 right 
+3470 right #([?] ?)
+3475 go 2000
+
 3500 #101 (1)
+3501 if blank
+3502 go 3506
+3503 right
+3504 right 
+3505 go 3501
+3506 right
+3507 if eof
+3508 go 3504
+3509 left #([b] b) found eou
+3510 in #WRITE
+3515 out #PRINT
+3520 left # (? [?])
+3521 if eof
+3522 go 3527
+3523 left 
+3524 go 3520
+3527 left # ([?] e)
+3528 if blank
+3529 go 3520
+3540 left #(? [?]) found first bou
+3541 if blank
+3542 go 3549
+3543 left #([?] e)
+3544 if eof
+3545 go 4100 #last write done
+3546 go 3550
+3549 left
+3550 left #(? [?])
+3551 if blank
+3552 go 3549
+3553 left #([?] e)
+3554 if blank
+3555 go 3550
+3560 #found second bou
+3565 right 
+3570 right #([?] ?)
+3575 go 2100
+
 3600 #110 (1)
+3601 if blank
+3602 go 3606
+3603 right
+3604 right 
+3605 go 3601
+3606 right
+3607 if eof
+3608 go 3604
+3609 left #([b] b) found eou
+3610 in #WRITE
+3615 out #PRINT
+3620 left # (? [?])
+3621 if eof
+3622 go 3627
+3623 left 
+3624 go 3620
+3627 left # ([?] e)
+3628 if blank
+3629 go 3620
+3640 left #(? [?]) found first bou
+3641 if blank
+3642 go 3649
+3643 left #([?] e)
+3644 if eof
+3645 go 4200 #last write done
+3646 go 3650
+3649 left
+3650 left #(? [?])
+3651 if blank
+3652 go 3649
+3653 left #([?] e)
+3654 if blank
+3655 go 3650
+3660 #found second bou
+3665 right 
+3670 right #([?] ?)
+3675 go 2200
+
 3700 #111 (0)
+3701 if blank
+3702 go 3706
+3703 right
+3704 right 
+3705 go 3701
+3706 right
+3707 if eof
+3708 go 3704
+3709 left #([b] b) found eou
+3710 out #PRINT
+3714 right #(b [e])
+3715 in #WRITE
+3716 left 
+3720 left # (? [?])
+3721 if eof
+3722 go 3727
+3723 left 
+3724 go 3720
+3727 left # ([?] e)
+3728 if blank
+3729 go 3720
+3740 left #(? [?]) found first bou
+3741 if blank
+3742 go 3749
+3743 left #([?] e)
+3744 if eof
+3745 go 4300 #last write done
+3746 go 3750
+3749 left
+3750 left #(? [?])
+3751 if blank
+3752 go 3749
+3753 left #([?] e)
+3754 if blank
+3755 go 3750
+3760 #found second bou
+3765 right 
+3770 right #([?] ?)
+3775 go 2300
 
 
 #if read two consecutive bou's in 3000's, stores last two digits read
